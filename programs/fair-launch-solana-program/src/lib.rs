@@ -17,7 +17,8 @@ pub mod fair_launch_solana_program {
     pub fn configure(ctx: Context<Configure>, new_config: Config) -> Result<()> {
         ctx.accounts.handle(new_config)
     }
-}
 
-#[derive(Accounts)]
-pub struct Initialize {}
+    pub fn launch(ctx: Context<Launch>, name: String, symbol: String, uri: String) -> Result<()> {
+        ctx.accounts.handle(name, symbol, uri, ctx.bumps.bonding_curve)
+    }
+}

@@ -1,4 +1,4 @@
-use crate::{ states::Config};
+use crate::{states::Config};
 use anchor_lang::prelude::*;
 use crate::constants::{ADMIN_ADDRESS, CONFIG_SEED_IN_BYTES};
 
