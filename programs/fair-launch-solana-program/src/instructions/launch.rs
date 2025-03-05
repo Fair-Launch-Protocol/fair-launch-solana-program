@@ -75,7 +75,6 @@ impl<'info> Launch<'info> {
 
         // initialising bonding curve pda
         bonding_curve.virtual_sol_reserves = 0;
-        bonding_curve.token_total_supply = global_config.total_token_supply;
         bonding_curve.is_completed = false;
         // TODO: This might change to reserve tokens for influencer
         bonding_curve.virtual_token_reserves = global_config.total_token_supply;

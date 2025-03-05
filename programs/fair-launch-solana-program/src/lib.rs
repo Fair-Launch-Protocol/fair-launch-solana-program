@@ -2,6 +2,8 @@ mod instructions;
 mod states;
 mod errors;
 mod constants;
+mod utils;
+mod events;
 
 use crate::instructions::*;
 use crate::states::*;
