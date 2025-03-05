@@ -11,8 +11,8 @@ fair_launch_solana_program = "9skK6yTzZgPmkYwwdwsVw9GzFkjHd9pVUnKJWsGYpv7m"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "https://api.testnet.v1.sonic.game"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.test.ts"

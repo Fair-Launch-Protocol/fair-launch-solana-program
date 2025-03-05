@@ -7,13 +7,3 @@ pub struct BondingCurve {
     pub token_total_supply: u64,
     pub is_completed: bool,
 }
-
-impl<'info> BondingCurve {
-    //  get signer for bonding curve PDA
-    pub fn get_signer<'a>(mint: &'a Pubkey, bump: &'a u8) -> [&'a [u8]; 2] {
-        [
-            mint.as_ref(),
-            std::slice::from_ref(bump),
-        ]
-    }
-}

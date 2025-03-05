@@ -19,6 +19,6 @@ pub mod fair_launch_solana_program {
     }
 
     pub fn launch(ctx: Context<Launch>, name: String, symbol: String, uri: String) -> Result<()> {
-        ctx.accounts.handle(name, symbol, uri, ctx.bumps.bonding_curve)
+        ctx.accounts.handle(name, symbol, uri, ctx.bumps.global_config)
     }
 }
