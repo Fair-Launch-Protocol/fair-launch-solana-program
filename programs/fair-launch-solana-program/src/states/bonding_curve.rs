@@ -7,7 +7,8 @@ use crate::utils::{sol_transfer_from_user, token_transfer_from_pda};
 #[account]
 pub struct BondingCurve {
     pub virtual_token_reserves: u64,
-    pub virtual_sol_reserves: u64,
+    pub virtual_lamport_reserves: u64,
+    pub actual_lamport_reserves: u64,
     pub is_completed: bool,
 }
 
@@ -19,11 +20,10 @@ impl<'info> BondingCurve {
         ]
     }
 
-    pub fn update_reserves(&mut self, reserve_lamport: u64, reserve_token: u64) -> Result<bool> {
-        self.virtual_sol_reserves = reserve_lamport;
-        self.virtual_token_reserves = reserve_token;
-
-        Ok(false)
+    pub fn update_reserves(&mut self, virtual_lamport_reserves: u64, virtual_token_reserves: u64, actual_lamport_reserves: u64) {
+        self.virtual_lamport_reserves = virtual_lamport_reserves;
+        self.virtual_token_reserves = virtual_token_reserves;
+        self.actual_lamport_reserves = actual_lamport_reserves;
     }
 
     //  calculate amount out and fee lamports
@@ -37,7 +37,7 @@ impl<'info> BondingCurve {
         let amount_in_after_fee = amount_in - fee_lamports;
 
         let x = self.virtual_token_reserves as f64;
-        let y = self.virtual_sol_reserves as f64;
+        let y = self.virtual_lamport_reserves as f64;
         let k = x * y;
 
         let amount_out: f64 = if is_buy {
@@ -67,7 +67,6 @@ impl<'info> BondingCurve {
         curve_ata: &mut AccountInfo<'info>, //  associated toke accounts for curve
 
         amount_in: u64, //  sol amount to pay
-        min_amount_out: u64, //  minimum amount out
         fee_percent: f64, //  buy fee
 
         curve_bump: u8, // bump for signer
@@ -78,12 +77,6 @@ impl<'info> BondingCurve {
 
         let (amount_out, fee_lamports, amount_in_after_fees) =
             self.calc_amount_out(amount_in, true, fee_percent)?;
-
-        //  check min amount out
-        require!(
-            amount_out >= min_amount_out,
-            CustomError::ReturnAmountTooSmall
-        );
 
         //  transfer fee to team wallet
         sol_transfer_from_user(&user, fee_recipient, system_program, fee_lamports)?;
@@ -105,13 +98,18 @@ impl<'info> BondingCurve {
             .checked_sub(amount_out)
             .ok_or(CustomError::OverflowOrUnderflowOccurred)?;
 
-        let new_sol_reserves = self
-            .virtual_sol_reserves
+        let new_virtual_sol_reserves = self
+            .virtual_lamport_reserves
+            .checked_add(amount_in_after_fees)
+            .ok_or(CustomError::OverflowOrUnderflowOccurred)?;
+
+        let new_actual_sol_reserves = self
+            .actual_lamport_reserves
             .checked_add(amount_in_after_fees)
             .ok_or(CustomError::OverflowOrUnderflowOccurred)?;
 
         //  update reserves on the curve
-        self.update_reserves(new_sol_reserves, new_token_reserves)?;
+        self.update_reserves(new_virtual_sol_reserves, new_token_reserves, new_actual_sol_reserves);
 
         emit!(TradeEvent {
             trader: user.key(),
@@ -122,7 +120,7 @@ impl<'info> BondingCurve {
         });
 
         //  return true if the curve reached the limit
-        if new_sol_reserves >= lamports_needed_to_complete_curve {
+        if new_actual_sol_reserves >= lamports_needed_to_complete_curve {
             self.is_completed = true;
             return Ok(true);
         }

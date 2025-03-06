@@ -1,4 +1,5 @@
 use anchor_lang::{prelude::*, system_program, solana_program::sysvar::SysvarId};
+use anchor_lang::solana_program::native_token::LAMPORTS_PER_SOL;
 use crate::constants::{ADMIN_ADDRESS, TOKEN_DECIMAL, CONFIG_SEED_IN_BYTES};
 use crate::states::{Config, BondingCurve};
 use anchor_spl::{
@@ -74,7 +75,8 @@ impl<'info> Launch<'info> {
         let global_config = &self.global_config;
 
         // initialising bonding curve pda
-        bonding_curve.virtual_sol_reserves = 0;
+        bonding_curve.virtual_lamport_reserves = 100 * LAMPORTS_PER_SOL;
+        bonding_curve.actual_lamport_reserves = 0;
         bonding_curve.is_completed = false;
         // TODO: This might change to reserve tokens for influencer
         bonding_curve.virtual_token_reserves = global_config.total_token_supply;

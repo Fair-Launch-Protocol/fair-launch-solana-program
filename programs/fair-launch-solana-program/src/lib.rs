@@ -23,4 +23,8 @@ pub mod fair_launch_solana_program {
     pub fn launch(ctx: Context<Launch>, name: String, symbol: String, uri: String) -> Result<()> {
         ctx.accounts.handle(name, symbol, uri, ctx.bumps.global_config)
     }
+
+    pub fn swap(ctx: Context<Swap>, amount_in: u64, is_buy: bool) -> Result<()> {
+        ctx.accounts.handle(amount_in, is_buy, ctx.bumps.bonding_curve)
+    }
 }
