@@ -86,6 +86,18 @@ impl<'info> Swap<'info> {
                 &self.token_program.to_account_info()
             )?;
         } else {
+            bonding_curve.sell(
+                &self.token_mint,
+                &mut self.user.to_account_info(),
+                bonding_curve_pda,
+                &mut self.fee_recipient,
+                &mut self.user_token_account.to_account_info(),
+                &mut self.curve_token_account.to_account_info(),
+                amount_in,
+                global_config.sell_fee_percent,
+                bump_bonding_curve,
+                &self.token_program.to_account_info()
+            )?;
         }
 
         Ok(())

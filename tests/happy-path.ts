@@ -7,25 +7,26 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
   getMint,
+  getAccount,
   getTokenMetadata,
   TOKEN_PROGRAM_ID
 } from "@solana/spl-token";
 import { MPL_TOKEN_METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata"
 import {getLocalAccount} from "./utils";
 
-describe("Admin Operations", () => {
+describe("Happy Path", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
 
   const program = anchor.workspace.FairLaunchSolanaProgram as Program<FairLaunchSolanaProgram>;
 
-  it("only allows the admin wallet to configure & launch", async () => {
+  it("Admin configures program, launches token, buys & sells the token", async () => {
     const connection = anchor.getProvider().connection;
     const adminKeypair = await getLocalAccount();
     const admin = anchor.getProvider().publicKey;
     const feeRecipient = new anchor.web3.PublicKey("ABMHApyZu8DfuaGoKoLk4yRHFsvzHwsEsGZXKsJ19FBX");
     const [globalConfig] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("global-config")], program.programId);
-    const lamportsNeededToCompleteCurve = new BN(100);
+    const lamportsNeededToCompleteCurve = new BN(100 * anchor.web3.LAMPORTS_PER_SOL);
     const totalTokenSupply = new BN(1_000_000_000).mul((new BN(10).pow(new BN(6))));
     const buyFeePercent = 1;
     const sellFeePercent = 1;
@@ -121,7 +122,7 @@ describe("Admin Operations", () => {
     const userTokenAccount = getAssociatedTokenAddressSync(tokenMint, admin);
 
     const feeRecipientBalanceBeforeBuyTx = await connection.getBalance(feeRecipient);
-    const buyAmountInLamports = 0.1 * anchor.web3.LAMPORTS_PER_SOL;
+    const buyAmountInLamports = 0.02 * anchor.web3.LAMPORTS_PER_SOL;
     const buyHash = await program.methods
       .swap(
         new BN(buyAmountInLamports),
@@ -144,5 +145,28 @@ describe("Admin Operations", () => {
     console.log(`Buy tx: ${buyHash}`);
     const feeRecipientAfterBuyTx = await connection.getBalance(feeRecipient)
     expect(feeRecipientAfterBuyTx).to.equal(feeRecipientBalanceBeforeBuyTx + (buyAmountInLamports * 0.01));
+    const userTokenAccountInfo = await getAccount(connection, userTokenAccount, "confirmed");
+    console.log(`User has ${userTokenAccountInfo.amount} tokens`);
+    const sellHash = await program.methods
+      .swap(
+        // new BN(1979),
+        new BN(userTokenAccountInfo.amount.toString()),
+        false,
+      )
+      .accountsStrict({
+        user: admin,
+        feeRecipient,
+        userTokenAccount,
+        globalConfig,
+        tokenMint,
+        bondingCurve,
+        curveTokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([adminKeypair])
+      .rpc();
+    console.log(`Sell tx: ${sellHash}`);
   });
 });

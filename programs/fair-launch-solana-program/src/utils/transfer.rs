@@ -1,7 +1,7 @@
 use anchor_lang::{
     prelude::*,
     solana_program::{
-        program::{invoke, invoke_signed},
+        program::invoke,
         system_instruction::transfer,
     },
 };
@@ -47,5 +47,40 @@ pub fn token_transfer_from_pda<'info>(
     );
     token::transfer(cpi_ctx, amount)?;
 
+    Ok(())
+}
+
+pub fn sol_transfer_from_curve<'info>(
+    bonding_curve_account: &mut AccountInfo<'info>,
+    user_account: &mut AccountInfo<'info>,
+    amount: u64,
+) -> Result<()> {
+    **bonding_curve_account
+        .to_account_info()
+        .try_borrow_mut_lamports()? -= amount;
+    **user_account
+        .to_account_info()
+        .try_borrow_mut_lamports()? += amount;
+
+    Ok(())
+}
+
+pub fn token_transfer_from_user<'info>(
+    mint: &AccountInfo<'info>,
+    from: &AccountInfo<'info>,
+    authority: &AccountInfo<'info>,
+    to: &AccountInfo<'info>,
+    token_program: &AccountInfo<'info>,
+    amount: u64,
+) -> Result<()> {
+    let cpi_ctx: CpiContext<_> = CpiContext::new(
+        token_program.to_account_info(),
+        token::Transfer {
+            from: from.to_account_info(),
+            authority: authority.to_account_info(),
+            to: to.to_account_info(),
+        },
+    );
+    token::transfer(cpi_ctx, amount)?;
     Ok(())
 }

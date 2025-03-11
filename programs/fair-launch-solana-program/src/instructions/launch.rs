@@ -75,8 +75,7 @@ impl<'info> Launch<'info> {
         let global_config = &self.global_config;
 
         // initialising bonding curve pda
-        bonding_curve.virtual_lamport_reserves = 100 * LAMPORTS_PER_SOL;
-        bonding_curve.actual_lamport_reserves = 0;
+        bonding_curve.virtual_lamport_reserves = 100 * LAMPORTS_PER_SOL; // initial mcap
         bonding_curve.is_completed = false;
         // TODO: This might change to reserve tokens for influencer
         bonding_curve.virtual_token_reserves = global_config.total_token_supply;
