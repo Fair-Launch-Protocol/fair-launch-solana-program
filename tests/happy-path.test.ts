@@ -1,17 +1,16 @@
 import * as anchor from "@coral-xyz/anchor";
-import { AnchorError, Program } from "@coral-xyz/anchor";
-import { FairLaunchSolanaProgram } from "../target/types/fair_launch_solana_program";
+import {AnchorError, Program} from "@coral-xyz/anchor";
+import {FairLaunchSolanaProgram} from "../target/types/fair_launch_solana_program";
 import BN from "bn.js";
-import { expect } from "chai";
+import {expect} from "chai";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAccount,
   getAssociatedTokenAddressSync,
   getMint,
-  getAccount,
-  getTokenMetadata,
   TOKEN_PROGRAM_ID
 } from "@solana/spl-token";
-import { MPL_TOKEN_METADATA_PROGRAM_ID } from "@metaplex-foundation/mpl-token-metadata"
+import {MPL_TOKEN_METADATA_PROGRAM_ID} from "@metaplex-foundation/mpl-token-metadata"
 import {getLocalAccount} from "./utils";
 
 describe("Happy Path", () => {
@@ -122,7 +121,7 @@ describe("Happy Path", () => {
     const userTokenAccount = getAssociatedTokenAddressSync(tokenMint, admin);
 
     const feeRecipientBalanceBeforeBuyTx = await connection.getBalance(feeRecipient);
-    const buyAmountInLamports = 0.02 * anchor.web3.LAMPORTS_PER_SOL;
+    const buyAmountInLamports = 0.0001 * anchor.web3.LAMPORTS_PER_SOL;
     const buyHash = await program.methods
       .swap(
         new BN(buyAmountInLamports),

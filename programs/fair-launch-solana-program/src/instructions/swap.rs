@@ -95,7 +95,6 @@ impl<'info> Swap<'info> {
                 &mut self.curve_token_account.to_account_info(),
                 amount_in,
                 global_config.sell_fee_percent,
-                bump_bonding_curve,
                 &self.token_program.to_account_info()
             )?;
         }

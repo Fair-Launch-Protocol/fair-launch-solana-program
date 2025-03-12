@@ -66,7 +66,6 @@ pub fn sol_transfer_from_curve<'info>(
 }
 
 pub fn token_transfer_from_user<'info>(
-    mint: &AccountInfo<'info>,
     from: &AccountInfo<'info>,
     authority: &AccountInfo<'info>,
     to: &AccountInfo<'info>,

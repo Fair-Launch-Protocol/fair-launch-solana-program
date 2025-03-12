@@ -151,8 +151,6 @@ impl<'info> BondingCurve {
         amount_in: u64,      //  token amount to sell
         fee_percent: f64,    //  sell fee
 
-        curve_bump: u8, // bump for signer
-
         token_program: &AccountInfo<'info>,  //  token program
     ) -> Result<()> {
         let (amount_out, fee_lamports) =
@@ -160,7 +158,6 @@ impl<'info> BondingCurve {
 
         //  transfer token from user to PDA
         token_transfer_from_user(
-            &token_mint.to_account_info(),
             user_ata,
             user,
             curve_ata,
