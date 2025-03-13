@@ -8,3 +8,11 @@ pub struct TradeEvent {
     pub amount_in: u64,
     pub amount_out: u64,
 }
+
+#[event]
+pub struct LaunchEvent {
+    pub mint: Pubkey,
+    pub name: String,
+    pub symbol: String,
+    pub uri: String,
+}

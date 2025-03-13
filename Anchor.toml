@@ -11,8 +11,8 @@ fair_launch_solana_program = "9skK6yTzZgPmkYwwdwsVw9GzFkjHd9pVUnKJWsGYpv7m"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "https://api.testnet.v1.sonic.game"
-#cluster = "https://rpc.mainnet-alpha.sonic.game"
+#cluster = "https://api.testnet.v1.sonic.game"
+cluster = "https://rpc.mainnet-alpha.sonic.game"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

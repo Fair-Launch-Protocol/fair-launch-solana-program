@@ -7,6 +7,7 @@ use anchor_spl::{
     metadata::{self, mpl_token_metadata::types::DataV2, Metadata},
     token::{self, spl_token::instruction::AuthorityType, Mint, Token, TokenAccount},
 };
+use crate::events::LaunchEvent;
 
 #[derive(Accounts)]
 pub struct Launch<'info> {
@@ -138,6 +139,13 @@ impl<'info> Launch<'info> {
             AuthorityType::MintTokens,
             None,
         )?;
+
+        emit!(LaunchEvent {
+            mint: self.token_mint.key(),
+            name,
+            symbol,
+            uri,
+        });
 
         Ok(())
     }
