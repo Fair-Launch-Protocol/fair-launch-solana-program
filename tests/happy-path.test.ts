@@ -11,7 +11,8 @@ import {
   TOKEN_PROGRAM_ID
 } from "@solana/spl-token";
 import {MPL_TOKEN_METADATA_PROGRAM_ID} from "@metaplex-foundation/mpl-token-metadata"
-import {getLocalAccount} from "./utils";
+import {getLocalAccount} from "../scripts/utils";
+import {feeRecipient, globalConfig} from "../scripts/constants";
 
 describe("Happy Path", () => {
   // Configure the client to use the local cluster.
@@ -23,8 +24,6 @@ describe("Happy Path", () => {
     const connection = anchor.getProvider().connection;
     const adminKeypair = await getLocalAccount();
     const admin = anchor.getProvider().publicKey;
-    const feeRecipient = new anchor.web3.PublicKey("ABMHApyZu8DfuaGoKoLk4yRHFsvzHwsEsGZXKsJ19FBX");
-    const [globalConfig] = anchor.web3.PublicKey.findProgramAddressSync([Buffer.from("global-config")], program.programId);
     const lamportsNeededToCompleteCurve = new BN(100 * anchor.web3.LAMPORTS_PER_SOL);
     const totalTokenSupply = new BN(1_000_000_000).mul((new BN(10).pow(new BN(6))));
     const buyFeePercent = 1;

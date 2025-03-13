@@ -16,6 +16,6 @@ export const createKeypairFromFile = (filePath: string) => {
   return anchor.web3.Keypair.fromSecretKey(secretKey);
 };
 
-export const getLocalAccount = async () => {
+export const getLocalAccount = () => {
   return createKeypairFromFile(KEYPAIR_FILE_PATH);
 };
